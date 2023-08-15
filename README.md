@@ -37,27 +37,21 @@ docker run --rm \
 ```
 
 ### Bacalhau
-Get the CIDs with `dpid-fetch`, or from the [raw node metadata](https://beta.dpid.org/78/v1/root/grid_reso_analysis?raw), and configure as `inputs`. Note that the image needs to be pushed to a public repository where Bacalhau can access it, this example uses a build from `m0ar`:
+Get the CIDs with [dpid-fetch](https://github.com/desci-labs/dpid-fetch) and configure as `inputs`. Note that the image needs to be pushed to a public repository where Bacalhau can access it, this example uses a build from `m0ar`:
 ```shell
-# Remove potential previous results
-mkdir -p results && rm -rf results/*
-
 # Run the job
 bacalhau docker run \
-  --download \
-  --output-dir=results \
   --input src=ipfs://bafybeiggs56o2lfnokepfnhllazq4pgohmdnmsdjrjdbxsyntmq2zlktri,dst=/inputs/chan_l6_4x12x24_4x4x8.h5 \
   --input src=ipfs://bafybeibeaampol2yz5xuoxex7dxri6ztqveqrybzfh5obz6jrul5gb4cf4,dst=/inputs/chan_l6_4x12x24_6x6x12.h5 \
   --input src=ipfs://bafybeibvt5s7scy6lvu6v5r3w2oiliti326ddtpx3hhtvphxpxpaeoiy2i,dst=/inputs/chan_l6_4x12x24_8x8x16.h5 \
   m0ar/grid_reso_analysis_desci:1.0.2
 ```
 
-When this has run, you can open the `results` directory and see the logs, exit code, and in particular the plot in `results/outputs/figure_14.pdf`.
+When this is running it will display the job ID. This can be used to check on progress and metadata using `bacalhau describe [job id]`, or to download the results when the job has terminated with `bacalhau get [job id]`.
+
+After fetching the results, you get a directory called `job-[job id]`. Open this in your file browser, and you can see the generated figure in `outputs/figure_14.pdf`!
 
 ## Troubleshooting
-### Output already exists
-If you run the Bacalhau job and get the `cannot merge results as output already exists` error, you need to remove previous results from the `results` dir with `rm -rf results`.
-
 ### Bacalhau ignoring your image changes
 When changing the image, if Bacalhau gives the same error even if you have updated the docker image, you may need to push it with a new tag. It is possible that tag names are cached for a while, so relying on the `latest` tag may not work with frequent updates.
 
